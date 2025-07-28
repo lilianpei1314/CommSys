@@ -20,6 +20,9 @@
         <el-form-item prop="password">
           <el-input type="password" show-password v-model="form.password" :prefix-icon="Lock" placeholder="请输入密码"/>
         </el-form-item>
+        <el-form-item prop="password">
+          <el-input type="password" show-password v-model="form.confirmpassword" :prefix-icon="Lock" placeholder="请确认密码"/>
+        </el-form-item>
         <el-form-item prop="region">
           <el-select v-model="form.region" placeholder="请输入你的职位">
             <el-option label="学生" value="Student" />
@@ -28,10 +31,10 @@
           </el-select>
         </el-form-item>
         <el-form-item>
-          <el-button round color="rgba(11,68,66,0.84)" class="buttonA" type="primary" @click="onSubmit">登 录</el-button>
+          <el-button round color="rgba(11,68,66,0.84)" class="buttonA" type="primary" @click="onSubmit">注 册</el-button>
         </el-form-item>
         <div class="register_A">
-          <a @click="router.push('./register')" class="register_B">注册</a>
+          <a @click="router.push('./login')" class="register_B">登录</a>
         </div>
       </el-form>
     </el-col>
@@ -42,11 +45,13 @@
   import {User,Lock} from '@element-plus/icons-vue'
   import {ElMessage} from 'element-plus'
   import router from '@/router'
+import { useRouter } from 'vue-router'
 
   // do not use same name with ref
   const form = reactive({
     username: '',
     password:'',
+    confirmpassword:'',
     region: 'Student',
   })
 
@@ -55,23 +60,28 @@
   const onSubmit = () => {
     uerFormInst.value.validate((valid)=>{
       if(valid){
-        request.post('@/pages/login', account).then((res) => {
-          if (res.code === '200') {
-            localStorage.setItem('account',JSON.stringify(res.data))
-            if (res.data === 'Admin'){
-              router.push('@/pages/back/index')
-            }else if (res.data === 'Cluber'){
-              router.push('@/pages/front/index')
-            }else {
-              router.push('@/pages/index')
-            }
-            ElMessage.success('登录成功')
-          }else{
-            ElMessage.error(res.msg || '出错啦')
+        if (form.password !== form.confirmpassword) {
+          ElMessage.error('两次输入的新密码不相同')
+          return false
+        }
+
+        const registerData = {
+          username: form.username,
+          password: form.password,
+          region: form.region
+        }
+        request.post('@/pages/redister', registerData).then((res)=>{
+          if (res.code === '200'){
+            ElMessage.success('注册成功，请登录')
+            router.push('./login')
+          } else {
+            ElMessage.error(res.msg || '注册失败')
           }
+        }).catch(error => {
+          console.error('注册请求错误', error)
+          ElMessage.error('注册失败，请稍后重试')
         })
       }
-      return false
     })
   }
 
@@ -82,6 +92,10 @@
     ],
     password:[
       {required: true, message:'请输入密码', trigger:'blur'},
+      {min: 1, max: 20,message:'长度在1到20个字符',trigger:'blur'},
+    ],
+    confirmpassword:[
+      {required: true, message:'请确认密码', trigger:'blur'},
       {min: 1, max: 20,message:'长度在1到20个字符',trigger:'blur'},
     ],
     region:[
