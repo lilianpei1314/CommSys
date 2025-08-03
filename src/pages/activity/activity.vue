@@ -1,28 +1,27 @@
 <template>
-  <view class="news-item" v-for="(item,index) in newList" :key="index">
-    <view v-if="item.image">
-      <el-image class="images" :src="item.image"/>
-    </view>
-    <view class="news-intr">
-      <view class="news-title">
-        <text>{{ item.name }}</text>
-      </view>
-      <view class="news-info">
-        <view class="news-time">
-          <text>{{ item.create_Time }}</text>
-        </view>
-      </view>
-    </view>
-  </view>
-  <el-pagination
+  <div class="news-container">
+    <div class="news-item" v-for="(item,index) in newList" :key="index">
+      <el-image v-if="item.image" class="images" :src="item.image" fit="cover"/>
+      <div class="news-intr">
+        <div class="news-title">
+          <span>{{ item.name }}</span>
+          <div class="news-info">
+            <div class="news-time">
+              <span>{{ item.create_Time }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <el-pagination style="margin-top: 15px;"
+      @size-change="handleSizeChange"
+      @current-change="handleCurrentChange"
       :current-page="parm.currentPage"
       :page-size="parm.pageSize"
       :page-sizes="[1,10,20,40,80,100]"
       layout="total,sizes, prev, pager, next,jumper"
-      :total="parm.total" background
-      @size-change="handleSizeChange"
-      @current-change="handleCurrentChange"
-      style="margin-top: 15px;">
+      :total="parm.total" background>
       </el-pagination>
 </template>
 
@@ -70,26 +69,63 @@ const handleCurrentChange = (page)=>{
 </script>
 
 <style lang="scss" scoped>
+.news-container {
+  padding: 20px;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 12px 0 rgba(0,0,0,0.1);
+}
 .news-item{
   display: flex;
-  height: 10px;
-  padding: 30px 0px;
+  margin-bottom: 15px;
+  padding: 25px 0px;
   border-bottom: 1px solid #e4e7ed;
   cursor: pointer;
+  &:hover{
+    background-color: #f9fafc;
+    transform: translateY(-2px);
+    transition: all 0.3s ease;
+  }
+  &:last-child{
+    border-bottom: none;
+    margin-bottom: 0;
+  }
   .images{
-    height: 100px;
-    width: 200px;
-    border-radius: 10px;
+    height: 120px;
+    width: 180px;
+    min-width: 180px;
+    border-radius: 8px;
+    margin-right: 20px;
+    object-fit: cover;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
   }
   .news-intr{
-    margin-left: 15px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    .news-title{
+      font-size: 18px;
+      font-weight: 600;
+      color: #333;
+      margin-bottom: 15px;
+      line-height: 1.5;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
     .news-info{
       display: flex;
-      font-size: 28px;
-      color: #999999;
-      margin-left: 16px;
+      align-items: center;
       .news-time{
         text-align: left;
+        font-size: 14px;
+        color: #999;
+        padding: 4px 10px;
+        background: #f5f7fa;
+        border-radius: 4px;
       }
     }
   }
